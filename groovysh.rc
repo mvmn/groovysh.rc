@@ -4,11 +4,29 @@ def mv_OF() { jfc = new javax.swing.JFileChooser(); jfc.setMultiSelectionEnabled
 
 def mv_OFs() { jfc = new javax.swing.JFileChooser(); jfc.setMultiSelectionEnabled(false); javax.swing.SwingUtilities.invokeAndWait({jfc.showOpenDialog(null);}); return jfc.selectedFiles; }
 
-def mv_LDp(String path) { this.class.classLoader.rootLoader.addURL(new File(path).toURI().toURL()); }
-
-def mv_LDf(file) { this.class.classLoader.rootLoader.addURL(file.toURI().toURL()); }
-
-def mv_LD() { closure = { jfc = new javax.swing.JFileChooser(); jfc.setMultiSelectionEnabled(true); javax.swing.SwingUtilities.invokeAndWait({ jfc.showOpenDialog(null); }); return jfc.selectedFiles; }; closure.call().each{ this.class.classLoader.rootLoader.addURL(it.toURI().toURL()); } };
+def mv_LD(param) {
+  if(param==null) {
+    closure = {
+      jfc = new javax.swing.JFileChooser(); jfc.setMultiSelectionEnabled(true); 
+      javax.swing.SwingUtilities.invokeAndWait({ jfc.showOpenDialog(null); }); 
+      return jfc.selectedFiles; 
+    };
+    closure.call().each{ mv_LD(it); }
+  } else if(param instanceof File) {
+    uri = param.toURI().toURL();
+    println "Adding to classpath: "+uri;
+    if(!param.exists()) {
+       println "! Note: file does not exist now - "+param.absolutePath;
+    }
+    this.class.classLoader.rootLoader.addURL(uri);
+  } else if(param instanceof Iterable) {
+    param.each{ mv_LD(it); }
+  } else if(param instanceof Object[]) {
+    param.each{ mv_LD(it); }
+  } else {
+    mv_LD(new File(param.toString()));
+  }
+}
 
 def mv_C() { return java.awt.Toolkit.defaultToolkit.systemClipboard.getContents(null).getTransferData(new java.awt.datatransfer.DataFlavor(String.class, "String")); }
 
@@ -24,15 +42,13 @@ return sout.toString();
 }
 
 def mv_Fork(closure) {
-	return new Thread() {
-		public void run() { closure.call(); }
-	};
+    return new Thread() {
+        public void run() { closure.call(); }
+    };
 }
 
 def mv_Grab(Object... params) {
-import groovy.grape.Grape                        
-import groovyx.net.http.*
-Grape.grab(params)
+groovy.grape.Grape.grab(params);
 }
 
 def mv_TClock() {
@@ -80,4 +96,33 @@ frame.contentPane.add(new javax.swing.JScrollPane(component), java.awt.BorderLay
 frame.pack();
 frame.setVisible(true);
 return frame;
+}
+
+def mv_source(param) {
+  if(param==null) {
+    closure = {
+      jfc = new javax.swing.JFileChooser(); jfc.setMultiSelectionEnabled(true); 
+      javax.swing.SwingUtilities.invokeAndWait({ jfc.showOpenDialog(null); }); 
+      return jfc.selectedFiles; 
+    };
+    closure.call().each{ mv_source(it); }
+  } else if(param instanceof File) {
+    if(!param.exists()) {
+       println "! File does not exist - "+param.absolutePath;
+    } else {
+       println "Evaluating file "+param.absolutePath;
+       rcFile = new File(System.getProperty("user.home")+File.separator+".groovy"+File.separator+"groovysh.rc");
+       code = param.text;
+       if(rcFile.exists()) {
+         code=rcFile.text+"\n\n"+code;
+       }
+       Eval.me(code);
+    }
+  } else if(param instanceof Iterable) {
+    param.each{ mv_source(it); }
+  } else if(param instanceof Object[]) {
+    param.each{ mv_source(it); }
+  } else {
+    mv_source(new File(param.toString()));
+  }
 }
