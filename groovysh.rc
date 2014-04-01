@@ -116,7 +116,11 @@ def mv_source(param) {
        if(rcFile.exists()) {
          code=rcFile.text+"\n\n"+code;
        }
-       Eval.me(code);
+       xshell = new GroovyShell(binding);
+       xscript = xshell.parse(code);
+       xscript.setBinding(binding);
+       xscript.run();
+       return xscript;
     }
   } else if(param instanceof Iterable) {
     param.each{ mv_source(it); }
