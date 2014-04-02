@@ -98,14 +98,14 @@ frame.setVisible(true);
 return frame;
 }
 
-def mv_source(param) {
+def mv_source(param, parent) {
   if(param==null) {
     closure = {
       jfc = new javax.swing.JFileChooser(); jfc.setMultiSelectionEnabled(true); 
       javax.swing.SwingUtilities.invokeAndWait({ jfc.showOpenDialog(null); }); 
       return jfc.selectedFiles; 
     };
-    closure.call().each{ mv_source(it); }
+    closure.call().each{ mv_source(it, parent); }
   } else if(param instanceof File) {
     if(!param.exists()) {
        println "! File does not exist - "+param.absolutePath;
@@ -116,17 +116,20 @@ def mv_source(param) {
        if(rcFile.exists()) {
          code=rcFile.text+"\n\n"+code;
        }
-       xshell = new GroovyShell(binding);
+       xbinding = binding;
+       if(parent!=null && parent.binding!=null) {
+         xbinding = parent.binding;
+       }
+       xshell = new GroovyShell(xbinding);
        xscript = xshell.parse(code);
-       xscript.setBinding(binding);
        xscript.run();
        return xscript;
     }
   } else if(param instanceof Iterable) {
-    param.each{ mv_source(it); }
+    param.each{ mv_source(it, parent); }
   } else if(param instanceof Object[]) {
-    param.each{ mv_source(it); }
+    param.each{ mv_source(it, parent); }
   } else {
-    mv_source(new File(param.toString()));
+    mv_source(new File(param.toString()), parent);
   }
 }
