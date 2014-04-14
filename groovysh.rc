@@ -13,12 +13,13 @@ def mv_LD(param) {
     };
     closure.call().each{ mv_LD(it); }
   } else if(param instanceof File) {
-    uri = param.toURI().toURL();
-    println "Adding to classpath: "+uri;
     if(!param.exists()) {
        println "! Note: file does not exist now - "+param.absolutePath;
     }
-    this.class.classLoader.rootLoader.addURL(uri);
+  	mv_LD(param.toURI().toURL())
+  } else if(param instanceof java.net.URL) {
+    println "Adding to classpath: "+param;
+    this.class.classLoader.rootLoader.addURL(param);
   } else if(param instanceof Iterable) {
     param.each{ mv_LD(it); }
   } else if(param instanceof Object[]) {
