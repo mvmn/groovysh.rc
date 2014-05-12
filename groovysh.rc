@@ -90,10 +90,19 @@ def mv_fjson(jsonString) {
 return groovy.json.JsonOutput.prettyPrint(jsonString);
 }
 
-def mv_enframe(component) {
+def mv_enframesc(component) {
 frame = new javax.swing.JFrame();
 frame.contentPane.setLayout(new java.awt.BorderLayout());
 frame.contentPane.add(new javax.swing.JScrollPane(component), java.awt.BorderLayout.CENTER);
+frame.pack();
+frame.setVisible(true);
+return frame;
+}
+
+def mv_enframe(component) {
+frame = new javax.swing.JFrame();
+frame.contentPane.setLayout(new java.awt.BorderLayout());
+frame.contentPane.add(component, java.awt.BorderLayout.CENTER);
 frame.pack();
 frame.setVisible(true);
 return frame;
