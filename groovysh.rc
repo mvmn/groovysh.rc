@@ -48,7 +48,7 @@ def mv_Fork(closure) {
     };
 }
 
-def mv_Grab(Object... params) {
+def mv_Grab(Map params) {
 groovy.grape.Grape.grab(params);
 }
 
