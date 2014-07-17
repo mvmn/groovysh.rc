@@ -29,6 +29,31 @@ def mv_LD(param) {
   }
 }
 
+def mv_LDc(param, classloader) {
+  if(param==null) {
+    closure = {
+      jfc = new javax.swing.JFileChooser(); jfc.setMultiSelectionEnabled(true);
+      javax.swing.SwingUtilities.invokeAndWait({ jfc.showOpenDialog(null); });
+      return jfc.selectedFiles;
+    };
+    closure.call().each{ mv_LDc(it,classloader); }
+  } else if(param instanceof File) {
+    if(!param.exists()) {
+       println "! Note: file does not exist now - "+param.absolutePath;
+    }
+  	mv_LDc(param.toURI().toURL(), classloader)
+  } else if(param instanceof java.net.URL) {
+    println "Adding to classpath: "+param;
+    classloader.addURL(param);
+  } else if(param instanceof Iterable) {
+    param.each{ mv_LDc(it,classloader); }
+  } else if(param instanceof Object[]) {
+    param.each{ mv_LDc(it,classloader); }
+  } else {
+    mv_LDc(new File(param.toString()),classloader);
+  }
+}
+
 def mv_C() { return java.awt.Toolkit.defaultToolkit.systemClipboard.getContents(null).getTransferData(new java.awt.datatransfer.DataFlavor(String.class, "String")); }
 
 def mv_CP(content) { return java.awt.Toolkit.defaultToolkit.systemClipboard.setContents(new java.awt.datatransfer.StringSelection(content.toString()), null); }
