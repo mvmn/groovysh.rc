@@ -3,43 +3,27 @@ class MV {
 		println (new File(System.getProperty("user.home")+File.separator+".groovy"+File.separator+"groovysh.rc").text);
 	}
 
-	public static Object of() {
+	private static javax.swing.JFileChooser jfcOpen(boolean allowMultiple) {
 		javax.swing.JFileChooser jfc = new javax.swing.JFileChooser();
-		jfc.setMultiSelectionEnabled(false);
+		jfc.setMultiSelectionEnabled(allowMultiple);
 		javax.swing.SwingUtilities.invokeAndWait({jfc.showOpenDialog(null);});
-		return jfc.selectedFile;
+		return jfc;
+	}
+
+	public static Object of() {
+		return jfcOpen(false).selectedFile;
 	}
 
 	public static Object ofs() {
-		javax.swing.JFileChooser jfc = new javax.swing.JFileChooser();
-		jfc.setMultiSelectionEnabled(false);
-		javax.swing.SwingUtilities.invokeAndWait({jfc.showOpenDialog(null);});
-		return jfc.selectedFiles;
+		return jfcOpen(true).selectedFiles;
+	}
+
+	public static Object ld() {
+		MV.ld(null);
 	}
 
 	public static Object ld(param) {
-		if(param==null) {
-			Object closure = {
-				javax.swing.JFileChooser jfc = new javax.swing.JFileChooser(); jfc.setMultiSelectionEnabled(true);
-				javax.swing.SwingUtilities.invokeAndWait({ jfc.showOpenDialog(null); });
-				return jfc.selectedFiles;
-			};
-			closure.call().each{ MV.ld(it); }
-		} else if(param instanceof File) {
-			if(!param.exists()) {
-				println "! Note: file does not exist now - "+param.absolutePath;
-			}
-			MV.ld(param.toURI().toURL())
-		} else if(param instanceof java.net.URL) {
-			println "Adding to classpath: "+param;
-			MV.class.classLoader.rootLoader.addURL(param);
-		} else if(param instanceof Iterable) {
-			param.each{ MV.ld(it); }
-		} else if(param instanceof Object[]) {
-			param.each{ MV.ld(it); }
-		} else {
-			MV.ld(new File(param.toString()));
-		}
+		MV.ldc(param, MV.class.classLoader.rootLoader);
 	}
 
 	public static Object ldc(param, classloader) {
@@ -141,12 +125,7 @@ class MV {
 	}
 
 	public static Object enframesc(component) {
-		javax.swing.JFrame frame = new javax.swing.JFrame();
-		frame.contentPane.setLayout(new java.awt.BorderLayout());
-		frame.contentPane.add(new javax.swing.JScrollPane(component), java.awt.BorderLayout.CENTER);
-		frame.pack();
-		frame.setVisible(true);
-		return frame;
+		return MV.enframe(new javax.swing.JScrollPane(component));
 	}
 
 	public static Object enframe(component) {
