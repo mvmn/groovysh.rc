@@ -69,11 +69,7 @@ class MV {
 	}
 
 	public static Object fork(closure) {
-		return new Thread() {
-			public void run() {
-				closure.call();
-			}
-		};
+		return new Thread(closure);
 	}
 
 	public static Object grab(Map params) {
