@@ -168,4 +168,21 @@ class MV {
 			MV.source(new File(param.toString()), parent);
 		}
 	}
+
+	public static int benchmark(closure) {
+		int t1 = System.currentTimeMillis();
+		closure.call();
+		int t2 = System.currentTimeMillis();
+		return t2 - t1;
+	}
+
+	public static int benchmark(org.codehaus.groovy.runtime.GeneratedClosure closure, Integer n) {
+		int t1 = System.currentTimeMillis();
+		int i = n;
+		while(i-->0) {
+			closure.call();
+		}
+		int t2 = System.currentTimeMillis();
+		return ((double)(t2 - t1))/n;
+	}
 }
