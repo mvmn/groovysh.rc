@@ -72,6 +72,10 @@ class MV {
 		return new Thread(closure);
 	}
 
+	public static Object grab(final String... params) {
+		grab([group:params.length>0?params[0]:null, module:params.length>1?params[1]:null, version:params.length>2?params[2]:null, classifier:params.length>3?params[3]:null]);
+	}
+	
 	public static Object grab(Map params) {
 		groovy.grape.Grape.grab(params);
 	}
