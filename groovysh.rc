@@ -29,7 +29,8 @@ class MV {
 	public static Object ldc(param, classloader) {
 		if(param==null) {
 			Object closure = {
-				jfc = new javax.swing.JFileChooser(); jfc.setMultiSelectionEnabled(true);
+				final javax.swing.JFileChooser jfc = new javax.swing.JFileChooser();
+				jfc.setMultiSelectionEnabled(true);
 				javax.swing.SwingUtilities.invokeAndWait({ jfc.showOpenDialog(null); });
 				return jfc.selectedFiles;
 			};
