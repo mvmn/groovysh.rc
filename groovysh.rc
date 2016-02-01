@@ -2,6 +2,26 @@ class MV {
 	public static Object help() {
 		println (new File(System.getProperty("user.home")+File.separator+".groovy"+File.separator+"groovysh.rc").text);
 	}
+	
+	public static GroovyClassLoader newgcl() {
+		return newgcl(Thread.currentThread().getContextClassLoader());
+	}
+	
+	public static GroovyClassLoader newgcl(ClassLoader cl) {
+		return new GroovyClassLoader(cl);
+	}
+	
+	public static org.codehaus.groovy.tools.shell.Groovysh newgsh() {
+		return newgsh(new groovy.lang.Binding());
+	}
+
+	public static org.codehaus.groovy.tools.shell.Groovysh newgsh(groovy.lang.Binding binding) {
+		return newgsh(binding, newgcl());
+	}
+
+	public static org.codehaus.groovy.tools.shell.Groovysh newgsh(groovy.lang.Binding binding, ClassLoader cl) {
+		return new org.codehaus.groovy.tools.shell.Groovysh(cl, binding, new org.codehaus.groovy.tools.shell.IO(System.in, System.out, System.err));
+	}
 
 	private static javax.swing.JFileChooser jfcOpen(boolean allowMultiple) {
 		javax.swing.JFileChooser jfc = new javax.swing.JFileChooser();
@@ -73,12 +93,18 @@ class MV {
 		return new Thread(closure);
 	}
 
-	public static Object grab(final String... params) {
-		grab([group:params.length>0?params[0]:null, module:params.length>1?params[1]:null, version:params.length>2?params[2]:null, classifier:params.length>3?params[3]:null]);
+	public static Object grab(final Object... params) {
+		java.util.Map args = params.length>4?["classLoader":params[4]]:["":""];
+		java.util.Map gparams = [group:params.length>0?params[0]:null, module:params.length>1?params[1]:null, version:params.length>2?params[2]:null, classifier:params.length>3?params[3]:null];
+		return grab(args, gparams);
 	}
 	
-	public static Object grab(Map params) {
-		groovy.grape.Grape.grab(params);
+	public static Object grab(java.util.Map params) {
+		return grab([], params);
+	}
+	
+	public static Object grab(java.util.Map args, java.util.Map params) {
+		return groovy.grape.Grape.grab(args, params);
 	}
 
 	public static Object tclock() {
