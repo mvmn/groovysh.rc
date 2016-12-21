@@ -86,7 +86,17 @@ class MV {
 		Object proc = cmd.execute(null, new File("/"));
 		proc.consumeProcessOutput(sout, serr);
 		proc.waitForOrKill(3000000);
+		System.err.println(serr);
 		return sout.toString();
+	}
+	
+	public static Object exeb(cmd) {
+		ByteArrayOutputStream sout = new ByteArrayOutputStream();
+		ByteArrayOutputStream serr = new ByteArrayOutputStream();
+		Object proc = cmd.execute(null, new File("/"));
+		proc.consumeProcessOutput(sout, serr);
+		proc.waitForOrKill(3000000);
+		return [sout.toByteArray(), serr.toByteArray()];
 	}
 
 	public static Object fork(closure) {
